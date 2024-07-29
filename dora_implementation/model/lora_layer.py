@@ -4,6 +4,10 @@ import torch.nn.functional as F
 
 
 class LoRALayer(nn.Module):
+    """
+    LoRA layer.
+    """
+
     def __init__(self, in_dim, out_dim, rank, alpha):
         """
 
@@ -15,12 +19,24 @@ class LoRALayer(nn.Module):
         """
         super().__init__()
         std_dev = 1 / torch.sqrt(torch.tensor(rank).float())
-
+        # pylint: disable=C0103
         self.A = nn.Parameter(torch.randn(in_dim, rank) * std_dev)
         self.B = nn.Parameter(torch.zeros(rank, out_dim))
+        # pylint: enable=C0103
         self.alpha = alpha
 
     def forward(self, x):
+        """
+        Forward pass of the LoRALayer.
+
+        This method applies the low-rank adaptation to the input tensor.
+
+        Args:
+            x (torch.Tensor): The input tensor.
+
+        Returns:
+            torch.Tensor: The output tensor after applying the low-rank adaptation.
+        """
         x = self.alpha * (x @ self.A @ self.B)
         return x
 
@@ -36,6 +52,19 @@ class LinearWithLoRA(nn.Module):
         self.lora = LoRALayer(linear.in_features, linear.out_features, rank, alpha)
 
     def forward(self, x):
+        """
+        Forward pass of the LinearWithLoRA layer.
+
+        This method applies the original linear transformation and the low-rank adaptation to the input tensor,
+         and returns their sum.
+
+        Args:
+            x (torch.Tensor): The input tensor.
+
+        Returns:
+            torch.Tensor: The output tensor after applying the original linear transformation and the low-rank
+            adaptation.
+        """
         return self.linear(x) + self.lora(x)
 
 
@@ -52,7 +81,19 @@ class LinearWithLoRAMerged(nn.Module):
         self.lora = LoRALayer(linear.in_features, linear.out_features, rank, alpha)
 
     def forward(self, x):
+        """
+        Forward pass of the LinearWithLoRAMerged layer.
+
+        This method combines the original weights and the low-rank adaptation matrices, and applies the combined
+        transformation to the input tensor.
+
+        Args:
+            x (torch.Tensor): The input tensor.
+
+        Returns:
+            torch.Tensor: The output tensor after applying the combined transformation.
+        """
         lora = self.lora.A @ self.lora.B
         combined_weight = self.linear.weight + self.lora.alpha * lora.T
 
-        return F.linear(x, combined_weight, self.linear.bias)
+        return F.linear(x, combined_weight, self.linear.bias)  # pylint: disable=E1102
