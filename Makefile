@@ -8,5 +8,9 @@ venv:
 
 .PHONY: format
 format:
-	black dora-implementation
-	ruff check --fix dora-implementation
+	black dora_implementation
+	ruff check --fix dora_implementation
+
+.PHONY: lint
+lint:
+	poetry run pylint dora_implementation
