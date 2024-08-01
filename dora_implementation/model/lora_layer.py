@@ -8,9 +8,8 @@ class LoRALayer(nn.Module):
     LoRA layer.
     """
 
-    def __init__(self, in_dim, out_dim, rank, alpha):
+    def __init__(self, in_dim: int, out_dim: int, rank: int, alpha: float) -> None:
         """
-
         Args:
             in_dim: The input dimension
             out_dim: The output dimension
@@ -25,7 +24,7 @@ class LoRALayer(nn.Module):
         # pylint: enable=C0103
         self.alpha = alpha
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the LoRALayer.
 
@@ -46,12 +45,12 @@ class LinearWithLoRA(nn.Module):
     Return the x.W + x.A.B, where W is the pretrained weights and A and B are the LoRA matrices.
     """
 
-    def __init__(self, linear, rank, alpha):
+    def __init__(self, linear: nn.Linear, rank: int, alpha: float) -> None:
         super().__init__()
         self.linear = linear
         self.lora = LoRALayer(linear.in_features, linear.out_features, rank, alpha)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the LinearWithLoRA layer.
 
@@ -75,12 +74,12 @@ class LinearWithLoRAMerged(nn.Module):
     Return x.(W+A.B), where W is the pretrained weights and A and B are the LoRA matrices.
     """
 
-    def __init__(self, linear, rank, alpha):
+    def __init__(self, linear: nn.Linear, rank: int, alpha: float) -> None:
         super().__init__()
         self.linear = linear
         self.lora = LoRALayer(linear.in_features, linear.out_features, rank, alpha)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the LinearWithLoRAMerged layer.
 

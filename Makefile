@@ -14,3 +14,8 @@ format:
 .PHONY: lint
 lint:
 	poetry run pylint dora_implementation
+
+.PHONY: reset-env
+reset-env:
+	rm -rf venv
+	make venv
