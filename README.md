@@ -77,7 +77,7 @@ During training, the low-rank matrices $A$ and $B$ are updated dynamically based
 
 1. **Magnitude Vector $m$**: 
    - The parameter $m$ is initialized based on the norm of the pretrained weight matrix $W$.
-   - It serves as a scaling factor that adjusts the magnitude of the weight updates.
+   - This parameter allows the model to dynamically adjust the scale of each weight vector in the combined weight matrix during training. This additional flexibility can help the model better capture the importance of different features.
 
 2. **Directional Component**:
    - The directional component is calculated by normalizing the sum of the original weights $W$ and the scaled output from the low-rank adaptation (LoRA) $BA$.
@@ -85,10 +85,32 @@ During training, the low-rank matrices $A$ and $B$ are updated dynamically based
 
 The new weights for the linear layer are then calculated by scaling the directional component with the parameter $m$. This process ensures that the updates are not only directionally aligned but also appropriately scaled, leading to more effective fine-tuning.
 
-## Installation
+# 🤗 Peft package 
+The Peft package from Hugging Face offers efficient techniques for fine-tuning large pre-trained models with a focus on parameter-efficient methods. It supports various configurations, including LoRA (Low-Rank Adaptation), making it suitable for diverse tasks such as sequence-to-sequence learning. For more details, visit the official documentation.
 
-To install the required dependencies, run:
+Example Usage
+```python 
+from peft import LoraConfig, get_peft_model, TaskType
 
-```bash
-pip install -r requirements.txt
+# Define the LoRA configuration
+lora_config = LoraConfig(
+    r=32,  # Rank: Controls the dimensionality reduction
+    lora_alpha=32,  # Scaling factor for the LoRA updates
+    target_modules=["q", "v"],  # Target only the attention layers
+    lora_dropout=0.05,  # Dropout rate for regularization
+    bias="none",  # No bias adjustment
+    task_type=TaskType.SEQ_2_SEQ_LM  # Specify task type, e.g., sequence-to-sequence for FLAN-T5
+)
+
+# Apply the LoRA configuration to the original model
+peft_model = get_peft_model(original_model, lora_config)
 ```
+
+
+## 📚 References
+This work has been widely influenced by the contributions of Sebastian Raschka, particularly through his detailed explanations and implementations in the following resources:
+
+- [LoRA and DoRA from Scratch](https://magazine.sebastianraschka.com/p/lora-and-dora-from-scratch): An in-depth article that explores the concepts of LoRA and DoRA, providing foundational knowledge and practical implementation tips.
+- [DoRA from Scratch GitHub Repository](https://github.com/rasbt/dora-from-scratch): A comprehensive repository containing the code and detailed instructions for implementing DoRA, as discussed in the article.
+
+These resources have been instrumental in shaping the approach and implementation strategies presented in this work.
