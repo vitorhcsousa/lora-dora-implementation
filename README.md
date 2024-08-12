@@ -1,4 +1,4 @@
-# LoRA and DoRA Implementation
+# LoRA and DoRA Implementation from Scratch
 
 This repository contains the implementation of LoRA and DoRA layers as proposed in the following papers:
 - [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685)
